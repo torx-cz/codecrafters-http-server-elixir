@@ -22,7 +22,8 @@ defmodule Server do
     {:ok, client} = :gen_tcp.accept(socket)
 
     # Spawn own task for handling requests from that client
-    IO.puts("Client connected: #{:inet.peername(client) |> inspect}")
+    IO.puts("[#{inspect(client)}] Client connected: #{:inet.peername(client) |> inspect}")
+
     {:ok, pid} = Task.Supervisor.start_child(Server.TaskSupervisor, fn -> server(client) end)
     :ok = :gen_tcp.controlling_process(client, pid)
 
@@ -31,28 +32,55 @@ defmodule Server do
 
   def server(client) do
     {:ok, data} = :gen_tcp.recv(client, 0)
-    [request_line | _] = String.split(data, "\r\n")
+    request = HTTPParser.parse(data)
+    IO.puts("[#{inspect(client)}] Request received: #{inspect(request)}")
 
-    case String.split(request_line, " ", parts: 3) do
-      ["GET", "/", _] ->
+    %{method: method, path: path} = request
+
+    case {method, path} do
+      {"GET", "/"} ->
         :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
 
-      ["GET", "/echo/" <> str, _] ->
-        :ok =
-          :gen_tcp.send(
-            client,
-            "HTTP/1.1 200 OK\r\n" <>
-              "Content-Type: text/plain\r\nContent-Length: #{byte_size(str)}\r\n\r\n" <> "#{str}"
-          )
+      {"GET", "/echo/" <> str} ->
+        :ok = :gen_tcp.send(client, generate_http_response_200(str))
 
-      ["GET", _path, _] ->
-        :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+      {"GET", "/user-agent"} ->
+        case request.headers["user-agent"] do
+          # TODO return some HTTP error - missing user-agent
+          nil -> :error
+          value -> :ok = :gen_tcp.send(client, generate_http_response_200(value))
+        end
 
       _ ->
         :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
     end
 
     :ok = :gen_tcp.close(client)
+  end
+
+  def generate_http_response_200(data) do
+    "HTTP/1.1 200 OK\r\n" <>
+      "Content-Type: text/plain\r\nContent-Length: #{byte_size(data)}\r\n\r\n" <> "#{data}"
+  end
+end
+
+defmodule HTTPParser do
+  def parse(request) do
+    [header_section | body] = String.split(request, "\r\n\r\n", parts: 2)
+
+    [request_line | header_lines] = String.split(header_section, "\r\n")
+    [method, path, "HTTP/1.1"] = String.split(request_line, " ", parts: 3)
+
+    headers = parse_headers(header_lines)
+
+    %{method: method, path: path, headers: headers, body: body}
+  end
+
+  defp parse_headers(lines) do
+    lines
+    |> Enum.map(fn line -> String.split(line, ":", parts: 2) end)
+    |> Enum.map(fn [key, value] -> {String.downcase(key), String.trim(value)} end)
+    |> Enum.into(%{})
   end
 end
 
