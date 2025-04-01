@@ -2,7 +2,10 @@ defmodule Server do
   use Application
 
   def start(_type, _args) do
-    Supervisor.start_link([{Task, fn -> Server.listen() end}], strategy: :one_for_one)
+    Supervisor.start_link(
+      [{Task.Supervisor, name: Server.TaskSupervisor}, {Task, fn -> Server.listen() end}],
+      strategy: :one_for_one
+    )
   end
 
   def listen() do
@@ -17,14 +20,27 @@ defmodule Server do
 
   def loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    IO.puts("Client connected: #{inspect(client)}")
 
-    :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
-    :ok = :gen_tcp.close(client)
+    # Spawn own task for handling requests from that client
+    IO.puts("Client connected: #{:inet.peername(client) |> inspect}")
+    {:ok, pid} = Task.Supervisor.start_child(Server.TaskSupervisor, fn -> server(client) end)
+    :ok = :gen_tcp.controlling_process(client, pid)
 
     loop_acceptor(socket)
   end
 
+  def server(client) do
+    {:ok, data} = :gen_tcp.recv(client, 0)
+    [request_line | _] = String.split(data, "\r\n")
+
+    case String.split(request_line, " ", parts: 3) do
+      ["GET", "/", _] -> :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
+      ["GET", _path, _] -> :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+      _ -> :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+    end
+
+    :ok = :gen_tcp.close(client)
+  end
 end
 
 defmodule CLI do
