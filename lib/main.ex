@@ -42,13 +42,20 @@ defmodule Server do
         :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
 
       {"GET", "/echo/" <> str} ->
-        :ok = :gen_tcp.send(client, generate_http_response_200(str))
+        :ok = :gen_tcp.send(client, generate_http_response_200(str, "text/plain"))
 
       {"GET", "/user-agent"} ->
         case request.headers["user-agent"] do
           # TODO return some HTTP error - missing user-agent
           nil -> :error
-          value -> :ok = :gen_tcp.send(client, generate_http_response_200(value))
+          value -> :ok = :gen_tcp.send(client, generate_http_response_200(value, "text/plain"))
+        end
+
+      {"GET", "/files/" <> filename} ->
+        path = Path.join(storage_directory(), filename)
+        case File.read(path) do
+          {:ok, file_data} -> :gen_tcp.send(client, generate_http_response_200(file_data, "application/octet-stream"))
+          {:error, _} -> :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
         end
 
       _ ->
@@ -58,9 +65,14 @@ defmodule Server do
     :ok = :gen_tcp.close(client)
   end
 
-  def generate_http_response_200(data) do
+  def generate_http_response_200(data, content_type) do
     "HTTP/1.1 200 OK\r\n" <>
-      "Content-Type: text/plain\r\nContent-Length: #{byte_size(data)}\r\n\r\n" <> "#{data}"
+      "Content-Type: #{content_type}\r\nContent-Length: #{byte_size(data)}\r\n\r\n" <> "#{data}"
+  end
+
+  def storage_directory() do
+    {parsed, _, _} = OptionParser.parse(System.argv(), strict: [directory: :string])
+    parsed[:directory]
   end
 end
 

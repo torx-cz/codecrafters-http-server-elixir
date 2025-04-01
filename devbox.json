@@ -3,7 +3,8 @@
   "packages": [
     "elixir@1.18",
     "elixir-ls@latest",
-    "inetutils@latest"
+    "inetutils@latest",
+    "erlang@27"
   ],
   "shell": {
     "init_hook": [
