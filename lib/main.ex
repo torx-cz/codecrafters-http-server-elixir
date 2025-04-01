@@ -53,9 +53,28 @@ defmodule Server do
 
       {"GET", "/files/" <> filename} ->
         path = Path.join(storage_directory(), filename)
+
         case File.read(path) do
-          {:ok, file_data} -> :gen_tcp.send(client, generate_http_response_200(file_data, "application/octet-stream"))
-          {:error, _} -> :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+          {:ok, file_data} ->
+            :gen_tcp.send(
+              client,
+              generate_http_response_200(file_data, "application/octet-stream")
+            )
+
+          {:error, _} ->
+            :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+        end
+
+      {"POST", "/files/" <> filename} ->
+        with "application/octet-stream" <- request.headers["content-type"],
+             {size, ""} <- Integer.parse(request.headers["content-length"]),
+             ^size <- byte_size(request.body) do
+          path = Path.join(storage_directory(), filename)
+
+          case File.write(path, request.body) do
+            :ok -> :gen_tcp.send(client, "HTTP/1.1 201 Created\r\n\r\n")
+            {:error, _} -> :error
+          end
         end
 
       _ ->
@@ -78,7 +97,7 @@ end
 
 defmodule HTTPParser do
   def parse(request) do
-    [header_section | body] = String.split(request, "\r\n\r\n", parts: 2)
+    [header_section, body] = String.split(request, "\r\n\r\n", parts: 2)
 
     [request_line | header_lines] = String.split(header_section, "\r\n")
     [method, path, "HTTP/1.1"] = String.split(request_line, " ", parts: 3)
