@@ -1,0 +1,169 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "elixir-ls@latest": {
+      "last_modified": "2024-12-27T03:08:00Z",
+      "resolved": "github:NixOS/nixpkgs/7cc0bff31a3a705d3ac4fdceb030a17239412210#elixir-ls",
+      "source": "devbox-search",
+      "version": "0.25.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ichp670bk1hvy0024g5pg7sisskdm89g-elixir-ls-0.25.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ichp670bk1hvy0024g5pg7sisskdm89g-elixir-ls-0.25.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/w4nxdb7j9si5vah7mvs494g580x67dz2-elixir-ls-0.25.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/w4nxdb7j9si5vah7mvs494g580x67dz2-elixir-ls-0.25.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/zmprrz19icpw7432rla947xmj3kv4a7r-elixir-ls-0.25.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/zmprrz19icpw7432rla947xmj3kv4a7r-elixir-ls-0.25.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/mbzwyakcjcjjdxs2vscakvqsxybbx56a-elixir-ls-0.25.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/mbzwyakcjcjjdxs2vscakvqsxybbx56a-elixir-ls-0.25.0"
+        }
+      }
+    },
+    "elixir@1.18": {
+      "last_modified": "2024-12-27T03:08:00Z",
+      "plugin_version": "0.0.1",
+      "resolved": "github:NixOS/nixpkgs/7cc0bff31a3a705d3ac4fdceb030a17239412210#elixir",
+      "source": "devbox-search",
+      "version": "1.18.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hdd9x34p0gplcl1bramq80lqi76xrd87-elixir-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hdd9x34p0gplcl1bramq80lqi76xrd87-elixir-1.18.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/a4g29icpil9b1hsniqspz5k110h4df8v-elixir-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/a4g29icpil9b1hsniqspz5k110h4df8v-elixir-1.18.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/b3h6f36zd4gjivb76lvvs6a9bi1mq9q8-elixir-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/b3h6f36zd4gjivb76lvvs6a9bi1mq9q8-elixir-1.18.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/3zd200bq28mv3pdbii7rijzmb0gmhhs3-elixir-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/3zd200bq28mv3pdbii7rijzmb0gmhhs3-elixir-1.18.1"
+        }
+      }
+    },
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "resolved": "github:NixOS/nixpkgs/88e992074d86ad50249de12b7fb8dbaadf8dc0c5?lastModified=1743472173&narHash=sha256-xwNv3FYTC5pl4QVZ79gUxqCEvqKzcKdXycpH5UbYscw%3D"
+    },
+    "inetutils@latest": {
+      "last_modified": "2025-03-11T17:52:14Z",
+      "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#inetutils",
+      "source": "devbox-search",
+      "version": "2.5",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/1jff6p2fm4pvqdlz0k2s4gf6adnlrwn8-inetutils-2.5",
+              "default": true
+            },
+            {
+              "name": "apparmor",
+              "path": "/nix/store/ycvz9yqk3xv34a362k9bfjac7dmlsld1-inetutils-2.5-apparmor"
+            }
+          ],
+          "store_path": "/nix/store/1jff6p2fm4pvqdlz0k2s4gf6adnlrwn8-inetutils-2.5"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/498vy27hrb63b5arsg36cpgp20mli1bj-inetutils-2.5",
+              "default": true
+            },
+            {
+              "name": "apparmor",
+              "path": "/nix/store/h0c9f0wgslh16xz35dpcl566is1sran3-inetutils-2.5-apparmor"
+            }
+          ],
+          "store_path": "/nix/store/498vy27hrb63b5arsg36cpgp20mli1bj-inetutils-2.5"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/frsd6g4n09wvyj582b42j1ll4yq9lvv9-inetutils-2.5",
+              "default": true
+            },
+            {
+              "name": "apparmor",
+              "path": "/nix/store/3gybxyhk5h5w099cbmd87911z2zg4msl-inetutils-2.5-apparmor"
+            }
+          ],
+          "store_path": "/nix/store/frsd6g4n09wvyj582b42j1ll4yq9lvv9-inetutils-2.5"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ih4kpa1lwvi2z316s3ry3l699cwjv3xd-inetutils-2.5",
+              "default": true
+            },
+            {
+              "name": "apparmor",
+              "path": "/nix/store/zz8bp4v9y2d8rw0n8cdic9xrbvlqixn1-inetutils-2.5-apparmor"
+            }
+          ],
+          "store_path": "/nix/store/ih4kpa1lwvi2z316s3ry3l699cwjv3xd-inetutils-2.5"
+        }
+      }
+    }
+  }
+}
