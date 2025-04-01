@@ -34,9 +34,22 @@ defmodule Server do
     [request_line | _] = String.split(data, "\r\n")
 
     case String.split(request_line, " ", parts: 3) do
-      ["GET", "/", _] -> :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
-      ["GET", _path, _] -> :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
-      _ -> :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+      ["GET", "/", _] ->
+        :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
+
+      ["GET", "/echo/" <> str, _] ->
+        :ok =
+          :gen_tcp.send(
+            client,
+            "HTTP/1.1 200 OK\r\n" <>
+              "Content-Type: text/plain\r\nContent-Length: #{byte_size(str)}\r\n\r\n" <> "#{str}"
+          )
+
+      ["GET", _path, _] ->
+        :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
+
+      _ ->
+        :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
     end
 
     :ok = :gen_tcp.close(client)
