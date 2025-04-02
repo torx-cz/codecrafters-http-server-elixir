@@ -42,13 +42,16 @@ defmodule Server do
         :ok = :gen_tcp.send(client, "HTTP/1.1 200 OK\r\n\r\n")
 
       {"GET", "/echo/" <> str} ->
-        :ok = :gen_tcp.send(client, generate_http_response_200(str, "text/plain"))
+        :ok = :gen_tcp.send(client, generate_http_response_200(str, "text/plain", request))
 
       {"GET", "/user-agent"} ->
         case request.headers["user-agent"] do
           # TODO return some HTTP error - missing user-agent
-          nil -> :error
-          value -> :ok = :gen_tcp.send(client, generate_http_response_200(value, "text/plain"))
+          nil ->
+            :error
+
+          value ->
+            :ok = :gen_tcp.send(client, generate_http_response_200(value, "text/plain", request))
         end
 
       {"GET", "/files/" <> filename} ->
@@ -58,7 +61,7 @@ defmodule Server do
           {:ok, file_data} ->
             :gen_tcp.send(
               client,
-              generate_http_response_200(file_data, "application/octet-stream")
+              generate_http_response_200(file_data, "application/octet-stream", request)
             )
 
           {:error, _} ->
@@ -84,9 +87,23 @@ defmodule Server do
     :ok = :gen_tcp.close(client)
   end
 
-  def generate_http_response_200(data, content_type) do
-    "HTTP/1.1 200 OK\r\n" <>
-      "Content-Type: #{content_type}\r\nContent-Length: #{byte_size(data)}\r\n\r\n" <> "#{data}"
+  def generate_http_response_200(data, content_type, request) do
+    case request.headers["accept-encoding"] do
+      "gzip" ->
+        compressed_data = :zlib.gzip(data)
+
+        "HTTP/1.1 200 OK\r\n" <>
+          "Content-Encoding: gzip\r\n" <>
+          "Content-Type: #{content_type}\r\n" <>
+          "Content-Length: #{byte_size(compressed_data)}\r\n\r\n" <>
+          compressed_data
+
+      _ ->
+        "HTTP/1.1 200 OK\r\n" <>
+          "Content-Type: #{content_type}\r\n" <>
+          "Content-Length: #{byte_size(data)}\r\n\r\n" <>
+          data
+    end
   end
 
   def storage_directory() do
