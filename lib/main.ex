@@ -88,8 +88,13 @@ defmodule Server do
   end
 
   def generate_http_response_200(data, content_type, request) do
-    case request.headers["accept-encoding"] do
-      "gzip" ->
+    encodings =
+      request.headers["accept-encoding"]
+      |> String.split(",")
+      |> Enum.map(&String.trim(&1))
+
+    case Enum.member?(encodings, "gzip") do
+      true ->
         compressed_data = :zlib.gzip(data)
 
         "HTTP/1.1 200 OK\r\n" <>
