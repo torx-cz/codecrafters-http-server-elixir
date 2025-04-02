@@ -89,9 +89,10 @@ defmodule Server do
 
   def generate_http_response_200(data, content_type, request) do
     encodings =
-      request.headers["accept-encoding"]
-      |> String.split(",")
-      |> Enum.map(&String.trim(&1))
+      case request.headers["accept-encoding"] do
+        nil -> []
+        raw_encodings -> String.split(raw_encodings, ",") |> Enum.map(&String.trim(&1))
+      end
 
     case Enum.member?(encodings, "gzip") do
       true ->
