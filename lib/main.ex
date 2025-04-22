@@ -83,8 +83,7 @@ defmodule Server do
       _ ->
         :ok = :gen_tcp.send(client, "HTTP/1.1 404 Not Found\r\n\r\n")
     end
-
-    :ok = :gen_tcp.close(client)
+    server(client)
   end
 
   def generate_http_response_200(data, content_type, request) do
